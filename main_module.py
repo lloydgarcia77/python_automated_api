@@ -1,7 +1,7 @@
 
 import os
 from handy_tools import value_checker
-from functionalities import jfrog_registries_repositories,  qualys_repositories, all_onboarded_difference_repositories
+from functionalities import jfrog_registries_repositories,  qualys_repositories, all_onboarded_difference_repositories, post_onboarding_cs_module
 
 loop = True 
 
@@ -19,6 +19,8 @@ while loop:
             qualys_repositories()
         elif value == 3:
             all_onboarded_difference_repositories()
+        elif value == 4:
+            post_onboarding_cs_module()
         elif value == 5:
             print("Good Bye!!!\n")
             loop = False

@@ -267,3 +267,104 @@ def all_onboarded_difference_repositories():
         else:
             os.system("cls")
             print("Invalid value!!!\n")
+
+def post_onboarding_cs_module():
+    os.system("cls")
+    while True:
+       
+        print("[----{title}----]".format(title="POST Onboarding CS Module".upper())) 
+        print("[1] - All at once \n[2] - Back")
+        value = input("Enter your choice: ")
+        valid, value = value_checker(value)
+        if valid:
+            value = int(value)
+            if value == 1:
+                # jfrog_auth = HTTPBasicAuth('qualys', 'wUsK3j8WBK2xFT9HsQ2YyhCA')
+                # qualys_auth = auth= HTTPBasicAuth('bckne3as', 'juAeFXsL')
+                print("--------------[JFROG LOGIN]--------------")
+                username, password = api_authentication()
+                jfrog_auth = HTTPBasicAuth(username,password) 
+                print("--------------[QUALYS LOGIN]--------------")
+                username, password = api_authentication()
+                qualys_auth = HTTPBasicAuth(username,password) 
+                repositories = [['b1fs-b1x-docker-buildkite-local','e92b970d-17aa-47b8-833f-4d34fcaec4bc','07:00'],['b1fs-b1x-docker-dev-local','7bb778cf-4d89-4e3d-bd84-0ee2dbd873a3','06:30']]
+                repositories = dict(zip([e for e in range(len(repositories))],repositories))
+                while True:
+                    print("Select the key of your choice:",repositories) 
+                    value = input("Enter your choice: ")
+                    valid, value = value_checker(value)
+                    if valid:
+                        value = int(value)
+                        choice = repositories.get(value)
+                        if choice is not None:  
+                            print("->",choice,"Selected!\nFetching...")
+                            jfrog, qualys, schedule = choice 
+                            jfrog_url = "https://blockone.jfrog.io/artifactory/api/docker/{jfrog}/v2/_catalog".format(jfrog=jfrog)
+                            jfrog_data = get_fetch(url=jfrog_url,auth=jfrog_auth) 
+                            if jfrog_data:
+                                jfrog_list = [data for data in jfrog_data["repositories"]]
+                                # print(jfrog_list)
+
+                            qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/repository?pageNo=1&pageSize=200".format(qualys=qualys)
+                            qualys_data = get_fetch(url=qualys_url,auth=qualys_auth) 
+                            if qualys_data:  
+                                qualys_list = [repoName["repoName"] for repoName in [data for data in qualys_data["data"]] ]
+                                # print(qualys_list)
+                            symmetric_difference = set(jfrog_list) ^ set(qualys_list)
+                            print("Symmteric Difference:\n")
+                            for diff in symmetric_difference:
+                                print("->",diff)
+                            print("Total: ",len(symmetric_difference),"\n")
+
+                            value = input("Do you want to post/onboard this difference: (Y/N)? ")
+                            if value.lower() == 'Y'.lower():
+                                payload = '''
+                                            {
+                                                "filters": [
+                                                {
+                                                    "days":null,
+                                                    "repoTags":  [
+                                                        {
+                                                        "repo":    "b1x-buildkite-cypress-runner",
+                                                        "tag":null
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                                "name":   "Automatic Scan Schedule",
+                                                "onDemand":  false,
+                                                "schedule":   "07:00"
+                                            }  
+                                          '''
+                                for diff in symmetric_difference:
+                                    json_payload = json.loads(payload)
+                                    json_payload["filters"][0]["repoTags"][0]["repo"] = diff
+                                    json_payload["schedule"] = schedule
+                                    json_payload = json.dumps(json_payload, indent=4, sort_keys=True)
+                                    print(json_payload)
+                                # url = "https://qualysguard.qg3.apps.qualys.com/cs/rest/1.0/registry/{qualys}/schedule".format(qualys=qualys)
+                                # print(url) 
+                            else:
+                                os.system("cls")
+                                print("Cancelling returning to main...")
+                                break
+                            # Posting
+                            break
+                        else:
+                            os.system("cls")
+                            break
+                            print("Invalid key!!!")
+                    else:
+                        os.system("cls")
+                        print("Invalid value!!!\n") 
+            elif value == 2:
+                os.system("cls")
+                print("Returning to main page!!!\n")
+                break
+            else:
+                print("Invalid value!!!\n")
+        else:
+            os.system("cls")
+            print("Invalid value!!!\n")
+
+    
