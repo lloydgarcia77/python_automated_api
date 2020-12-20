@@ -341,9 +341,15 @@ def post_onboarding_cs_module():
                                     json_payload["filters"][0]["repoTags"][0]["repo"] = diff
                                     json_payload["schedule"] = schedule
                                     json_payload = json.dumps(json_payload, indent=4, sort_keys=True)
-                                    print(json_payload)
-                                # url = "https://qualysguard.qg3.apps.qualys.com/cs/rest/1.0/registry/{qualys}/schedule".format(qualys=qualys)
-                                # print(url) 
+                                    print(json_payload) 
+                                    # Posting
+                                    url = "https://qualysguard.qg3.apps.qualys.com/cs/rest/1.0/registry/{qualys}/schedule".format(qualys=qualys)
+                                    """
+                                    Pre itong line 350 and 351 uncomment mo para ma post ung mga registries para ma try mo ma test mo
+                                    """
+                                    #   request = requests.request("POST", url, headers={}, data=json_payload, auth=qualys_auth) 
+                                    #   print(request.text) 
+                                    print(url)
                             else:
                                 os.system("cls")
                                 print("Cancelling returning to main...")
