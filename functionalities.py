@@ -152,9 +152,7 @@ def all_onboarded_difference_repositories():
                 print("--------------[QUALYS LOGIN]--------------")
                 username, password = api_authentication()
                 qualys_auth = HTTPBasicAuth(username,password) 
-
-                # jfrog_auth = HTTPBasicAuth('qualys', 'wUsK3j8WBK2xFT9HsQ2YyhCA')
-                # qualys_auth = auth= HTTPBasicAuth('bckne3as', 'juAeFXsL')
+ 
                 repositories = [['b1fs-b1x-docker-buildkite-local','e92b970d-17aa-47b8-833f-4d34fcaec4bc'],['b1fs-b1x-docker-dev-local','7bb778cf-4d89-4e3d-bd84-0ee2dbd873a3']]
                 
                 jfrog_list, qualys_list = [], []
@@ -196,9 +194,7 @@ def all_onboarded_difference_repositories():
 
             elif value == 2:
                 print("WARNING:", "Any file name that is existing already will be overwriten!")
-                
-                # jfrog_auth = HTTPBasicAuth('qualys', 'wUsK3j8WBK2xFT9HsQ2YyhCA')
-                # qualys_auth = auth= HTTPBasicAuth('bckne3as', 'juAeFXsL')
+                 
                 print("--------------[JFROG LOGIN]--------------")
                 username, password = api_authentication()
                 jfrog_auth = HTTPBasicAuth(username,password) 
@@ -278,9 +274,7 @@ def post_onboarding_cs_module():
         valid, value = value_checker(value)
         if valid:
             value = int(value)
-            if value == 1:
-                # jfrog_auth = HTTPBasicAuth('qualys', 'wUsK3j8WBK2xFT9HsQ2YyhCA')
-                # qualys_auth = auth= HTTPBasicAuth('bckne3as', 'juAeFXsL')
+            if value == 1: 
                 print("--------------[JFROG LOGIN]--------------")
                 username, password = api_authentication()
                 jfrog_auth = HTTPBasicAuth(username,password) 
