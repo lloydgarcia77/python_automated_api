@@ -86,15 +86,13 @@ def qualys_repositories():
                     for item in data:
                         registryUuid = item["registryUuid"]
                         print("Registry UUID:", registryUuid)
-                        url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{registry}/schedule?pageNo=1&pageSize=200".format(registry=registryUuid)   
-                        # url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{registry}/repository?pageNo=1&pageSize=200".format(registry=registryUuid)  
+                        url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{registry}/repository?pageNo=1&pageSize=200".format(registry=registryUuid)  
                         data = get_fetch(url=url,auth=auth)
-                        if data: 
+                        if data:
                             data = data["data"]
                             for item in data:
-                                repo = item["filters"][0]["repoTags"][0]["repo"]
-                                print("-",repo) 
-                            print("Total: "+str(len(data)),"\n") 
+                                print("-",item["repoName"])
+                            print("Total: "+str(len(data)),"\n")
                         else:
                             print("-> No results found!\n")                      
             elif value == 2:
@@ -115,14 +113,12 @@ def qualys_repositories():
                                 registryUuid = item["registryUuid"]
                                 writer.writerow(["Registry UUID:",registryUuid])  
                                 writer.writerow(["Repositories:"])  
-                                url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{registry}/schedule?pageNo=1&pageSize=200".format(registry=registryUuid)   
-                                # url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{registry}/repository?pageNo=1&pageSize=200".format(registry=registryUuid) 
+                                url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{registry}/repository?pageNo=1&pageSize=200".format(registry=registryUuid) 
                                 data = get_fetch(url=url,auth=auth)
                                 if data:
                                     data = data["data"]
                                     for item in data:
-                                        repo = item["filters"][0]["repoTags"][0]["repo"]
-                                        writer.writerow(['',repo])    
+                                        writer.writerow(['',item["repoName"]])    
                                     writer.writerow(['Total:',len(data)]) 
                                     writer.writerow([""])
                                 else:
@@ -165,27 +161,24 @@ def all_onboarded_difference_repositories():
                     # JFrog
                     jfrog_url = "https://blockone.jfrog.io/artifactory/api/docker/{jfrog}/v2/_catalog".format(jfrog=jfrog)
                     jfrog_data = get_fetch(url=jfrog_url,auth=jfrog_auth) 
-                    if jfrog_data: 
+                    if jfrog_data:
                         print(jfrog,":")
                         repositories = jfrog_data["repositories"]
                         for repository in repositories:
                             print('-',repository)
                             jfrog_list.append(repository)
                         print("Total:",len(repositories),"\n")
-
-                    # Qualys 
-                    # schedule
-                    qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/schedule?pageNo=1&pageSize=200".format(qualys=qualys)
-                    # repositories
-                    # qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/repository?pageNo=1&pageSize=200".format(qualys=qualys)
+                    # Qualys
+ 
+                    qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/repository?pageNo=1&pageSize=200".format(qualys=qualys)
                     qualys_data = get_fetch(url=qualys_url,auth=qualys_auth) 
-                    if qualys_data:  
+                    if qualys_data: 
                         print(qualys,":")
                         qualys_data = qualys_data["data"]
-                        for item in qualys_data:
-                            repo = item["filters"][0]["repoTags"][0]["repo"]
-                            print("-",repo)
-                            qualys_list.append(repo)
+                        for repoName in qualys_data:
+                            repoName = repoName["repoName"]
+                            print("-",repoName)
+                            qualys_list.append(repoName)
                         print("Total:",len(qualys_data),"\n")
                 
                     # Symmetric difference
@@ -232,10 +225,8 @@ def all_onboarded_difference_repositories():
                                     jfrog_list.append(repository)
                                 writer.writerow(['Total',len(repositories)])   
                             # Qualys
-                            # schedule
-                            qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/schedule?pageNo=1&pageSize=200".format(qualys=qualys)
-                            # repositories
-                            # qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/repository?pageNo=1&pageSize=200".format(qualys=qualys)
+        
+                            qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/repository?pageNo=1&pageSize=200".format(qualys=qualys)
                             qualys_data = get_fetch(url=qualys_url,auth=qualys_auth) 
                             if qualys_data: 
                                 qualys_data = qualys_data["data"]
@@ -243,10 +234,10 @@ def all_onboarded_difference_repositories():
                                 writer.writerow(['Registry UUID',qualys])  
                                 writer.writerow(['Repository Name','']) 
                                 
-                                for repo in qualys_data:
-                                    repo = repo["filters"][0]["repoTags"][0]["repo"]
-                                    writer.writerow(['',repo])  
-                                    qualys_list.append(repo) 
+                                for repoName in qualys_data:
+                                    repoName = repoName["repoName"]
+                                    writer.writerow(['',repoName])  
+                                    qualys_list.append(repoName) 
 
                                 writer.writerow(['Total',len(qualys_data)])  
                         
@@ -308,13 +299,10 @@ def post_onboarding_cs_module():
                                 jfrog_list = [data for data in jfrog_data["repositories"]]
                                 # print(jfrog_list)
 
-                            # schedule
-                            qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/schedule?pageNo=1&pageSize=200".format(qualys=qualys)
-                            # repositories
-                            # qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/repository?pageNo=1&pageSize=200".format(qualys=qualys)
+                            qualys_url = "https://qualysapi.qg3.apps.qualys.com/csapi/v1.1/registry/{qualys}/repository?pageNo=1&pageSize=200".format(qualys=qualys)
                             qualys_data = get_fetch(url=qualys_url,auth=qualys_auth) 
                             if qualys_data:  
-                                qualys_list = [repo["filters"][0]["repoTags"][0]["repo"] for repo in [data for data in qualys_data["data"]] ]
+                                qualys_list = [repoName["repoName"] for repoName in [data for data in qualys_data["data"]] ]
                                 # print(qualys_list)
                             symmetric_difference = set(jfrog_list) ^ set(qualys_list)
                             print("Symmteric Difference:\n")
